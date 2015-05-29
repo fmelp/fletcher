@@ -1,0 +1,84 @@
+import json
+import csv
+import numpy as np
+
+labels = ['source', 'review', 'sentiment', 'prediction']
+
+with open('all_fake_neg.txt', 'r') as f:
+    fake_neg = f.readlines()
+fake_neg_final = []
+for review in fake_neg:
+    fake_neg_final.append(['mturk', review.strip(), 0, 0])
+
+with open('all_fake_pos.txt', 'r') as f:
+    fake_pos = f.readlines()
+fake_pos_final = []
+for review in fake_pos:
+    fake_neg_final.append(['mturk', review.strip(), 1, 0])
+
+with open('all_unlabeled_neg.txt', 'r') as f:
+    real_neg = f.readlines()
+real_neg_final = []
+for review in real_neg:
+    real_neg_final.append(['trip_advisor', review.strip(), 0, np.nan])
+
+with open('all_unlabeled_pos.txt', 'r') as f:
+    real_pos = f.readlines()
+real_pos_final = []
+for review in real_pos:
+    real_pos_final.append(['trip_advisor', review.strip(), 1, np.nan])
+
+
+with open('expedia_data3.json') as f:
+    expedia = json.load(f)
+
+ta = []
+with open('ta_new3.csv', 'r') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if "Room Tip:" in row[0]:
+            print type(row)
+            print 'in'
+            review = row[0].split("Room Tip:")
+            review = review[0].strip()
+            print review
+            ta.append(['trip_advisor', review, np.nan, np.nan])
+            print type(review[0].strip())
+        elif "More" in row[0]:
+            continue
+        else:
+            review = row[0].strip()
+            ta.append(['trip_advisor', review, np.nan, np.nan])
+            print type(row[0])
+
+# ta = []
+# with open('ta_new3.csv', 'r') as f:
+#     reader = csv.reader(f)
+#     for row in reader:
+#         ta.append(row)
+
+print len(ta)
+
+
+expedia_final = []
+for key in expedia.keys():
+    for review in expedia[key]:
+        expedia_final.append(['expedia', review.strip(), np.nan, 1])
+
+print len(ta)
+print len(expedia_final)
+with open('review_data.csv', 'w') as fout:
+    writer = csv.writer(fout)
+    writer.writerow(labels)
+    for row in fake_neg_final:
+        writer.writerow(row)
+    for row in fake_pos_final:
+        writer.writerow(row)
+    for row in real_neg_final:
+        writer.writerow(row)
+    for row in real_pos_final:
+        writer.writerow(row)
+    for row in expedia_final:
+        writer.writerow(row)
+    for row in ta:
+        writer.writerow(row)

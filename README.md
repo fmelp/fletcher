@@ -42,6 +42,6 @@ The point of this project is to train a classifier to distinguish real from fake
           - need to look at what values of S are classified as
               - determine from there
       8. loop and update:
-           for each document d-e-U'
-              if Pr(1|d) < th then:
-                  RN = RN u {d}
+           - for each document d-e-U'
+              - if Pr(1|d) < th then:
+                  - RN = RN u {d}

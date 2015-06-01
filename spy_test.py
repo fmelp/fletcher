@@ -32,6 +32,7 @@ class Spy:
         else:
             raise ValueError("positive and unlabelled must be either paths to a csv or pandas DFs")
         self.p = perc_to_select
+        self.check = None
         # init th_factor -> how much you want to divide by
         self.th_factor = th_factor
         # assert U and P have same structure
@@ -40,7 +41,7 @@ class Spy:
         assert 'prediction' in self.U.columns, 'prediction must be a column in U'
         assert self.P.shape[1] == self.U.shape[1], 'U and P must have same number of features'
         self.process_dfs()
-        self.RN = self.Up[self.Up.prob_yes <= self.th]
+        # self.RN = self.Up[self.Up.prob_yes <= self.th]
 
 
     def process_dfs(self):
@@ -62,23 +63,23 @@ class Spy:
         '''
         df_fit = pd.concat([self.Up, self.Pp], ignore_index=True)
         y = pd.DataFrame(df_fit['prediction'], columns=['prediction'])
-        X = df_fit.drop(['prediction', 'spy', 'id'], axis=1)
+        X = df_fit.drop(['prediction', 'spy'], axis=1)
         classifier = MultinomialNB()
         fitted = classifier.fit(X, y)
-        X_to_pred = self.Up.drop(['prediction', 'spy', 'id'], axis=1).as_matrix()
-        X_to_pred = np.array(X_to_pred, dtype='float64')
-        probs = fitted.predict_proba(X_to_pred)
-        pred = fitted.predict(X_to_pred)
-        self.Up['NB_pred'] = pred
-        self.Up['prob_yes'] = [x[1] for x in probs]
+        X_to_pred = self.Up.drop(['prediction', 'spy'], axis=1)
+        self.check =  X_to_pred
+        # probs = fitted.predict_proba(X_to_pred)
+        # pred = fitted.predict(X_to_pred)
+        # self.Up['NB_pred'] = pred
+        # self.Up['prob_yes'] = [x[1] for x in probs]
 
 
     def find_threshold(self):
         # add probs to Up
         self.classify()
-        neg_class = self.Up[self.Up['NB_pred'] == 0]
-        th = np.mean(neg_class['prob_yes'])
-        self.th = th/self.th_factor
+        # neg_class = self.Up[self.Up['NB_pred'] == 0]
+        # th = np.mean(neg_class['prob_yes'])
+        # self.th = th/self.th_factor
 
 
     def split_data(self, data, size):

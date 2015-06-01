@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.cross_validation import train_test_split
 from sklearn.naive_bayes import MultinomialNB
-import numpy as np
 
 class Spy:
     """
@@ -30,69 +29,53 @@ class Spy:
                 RN = RN u {d}
     """
 
-    def __init__(self, positive, unlabelled, perc_to_select, th_factor):
-        '''
-        positive and unlabelled params can be either a path to a csv
-        or a pandas DF
-        '''
-        if isinstance(positive, str) and isinstance(unlabelled, str):
+    def __init__(self, path_to_positive, path_to_unlabelled, perc_to_select):
+        # try:
+            assert isinstance(path_to_positive, str), "path must be a string"
+            assert isinstance(path_to_unlabelled, str), "path must be a string"
             #init U -> unlabelled data
-            self.U = pd.read_csv(unlabelled)
+            self.U = pd.read_csv(path_to_unlabelled)
+            self.U['spy'] = [0]*len(self.U)
             #init P -> positive data
-            self.P = pd.read_csv(positive)
-        elif isinstance(positive, pd.DataFrame) and isinstance(unlabelled, pd.DataFrame):
-            #init U -> unlabelled data
-            self.U = unlabelled
-            #init P -> positive data
-            self.P = positive
-        else:
-            raise ValueError("positive and unlabelled must be either paths to a csv or pandas DFs")
-        self.p = perc_to_select
-        #init th_factor -> how much you want to divide by
-        self.th_factor = th_factor
-        #assert U and P have same structure
-            # NOTE: (U will need a NaN y column)
-        assert 'prediction' in self.P.columns, 'prediction must be a column in P'
-        assert 'prediction' in self.U.columns, 'prediction must be a column in U'
-        assert self.P.shape[1] == self.U.shape[1], 'U and P must have same number of features'
-        self.process_dfs()
-        self.RN = self.Up[self.Up.prob_yes <= self.th]
-
-
-    def process_dfs(self):
-        #add spy columns
-        self.U['spy'] = [0]*len(self.U)
-        self.P['spy'] = [0]*len(self.P)
-        #insert 'spy' Ps into U
-        self.Pp, self.S = self.split_data(self.P, (self.p/100.0))
-        self.S['spy'] = [1]*len(self.S)
-        self.Up = pd.concat([self.U, self.S], ignore_index=True)
-        self.Up['prediction'] = np.zeros(len(self.Up))
-        self.Pp['prediction'] = np.ones(len(self.Pp))
-        self.find_threshold()
-
+            self.P = pd.read_csv(path_to_positive)
+            self.P['spy'] = [0]*len(self.P)
+            #init RN -> real negatives as null
+            self.RN = None
+            self.th = None
+            #assert U and P have same structure
+                # NOTE: (U will need a NaN y column)
+            assert 'prediction' in self.P.columns, 'prediction must be a column in P'
+            assert 'prediction' in self.U.columns, 'prediction must be a column in U'
+            assert self.P.shape == self.U.shape, 'U and P must have same shape'
+            #insert 'spy' Ps into U
+            self.Pp, self.S = self.split_data(self.P, (perc_to_select/100.0))
+            self.S['spy'] = [1]*len(self.S)
+            self.Up = pd.concat([self.U, self.S], ignore_index=True)
+            self.Up['prediction'] = [0]*len(self.Up)
+            self.find_threshold()
+            self.RN = self.Up[self.Up.prob_yes <= self.th]
+        # except:
+        #     print "Files must be in csv format, and must have same column format"
 
     def classify(self):
-        '''
-        This is where the SPY part of the algorithm is implemented
-        '''
         df_fit = pd.concat([self.Up, self.Pp], ignore_index=True)
-        y = pd.DataFrame(df_fit['prediction'], columns=['prediction'])
-        X = df_fit.drop(['prediction', 'spy'], axis=1)
         classifier = MultinomialNB()
-        fitted = classifier.fit(X, y)
+        fitted = classifier.fit(df_fit.drop(['prediction', 'spy'], axis=1),
+                                df_fit['prediction'])
         probs = fitted.predict_proba(self.Up.drop(['prediction', 'spy'], axis=1))
         pred = fitted.predict(self.Up.drop(['prediction', 'spy'], axis=1))
         self.Up['NB_pred'] = pred
         self.Up['prob_yes'] = [x[1] for x in probs]
-
 
     def find_threshold(self):
         #add probs to Up
         self.classify()
         neg_class = self.Up[self.Up['NB_pred'] == 0]
         th = np.mean(neg_class['prob_yes'])
-        self.th = th/self.th_factor
+        self.th = th
+
+    # def get_RN(self):
+    #     self.RN = self.Up[self.Up.prob_yes <= self.th]
 
 
     def split_data(self, data, size):

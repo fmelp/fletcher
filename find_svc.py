@@ -49,7 +49,6 @@ def plot_roc(test_y, result_prob):
     plt.show()
 
 
-param_grid_svc = [{"C": [0.01, 0.1, 1], "kernel": ['rbf'], "gamma":[0.0, 0.01, 0.1, 1]}]
 def get_best_model_params(clf, train_X, train_y, param_grid, scoring_metric, cv):
     '''
     @param -> train_X : n-feature matrix : train feature data
@@ -79,7 +78,6 @@ vectors_df = pd.DataFrame(dense_vectors)
 #add vectors
 data = pd.concat([data, vectors_df], axis=1)
 
-
 U1 = data[data['source'] == 'trip_advisor']
 U1 = U1.drop(['source', 'review', 'sentiment'], axis=1)
 P1 = data[data['source'] == 'expedia']
@@ -107,52 +105,7 @@ y_train = pd.DataFrame(train['prediction'], columns=['prediction'])
 X_test = test.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
 y_test = pd.DataFrame(test['prediction'], columns=['prediction'])
 
-# svc = SVC(kernel='rbf', probability=True)
-# svc.fit(X_train, y_train)
-# result = svc.predict(X_test)
-# result_prob = svc.predict_proba(X_test)
-# y_true = np.array(y_test['prediction'].tolist(), dtype='float32')
-# y_pred = np.array(result, dtype='float32')
-# print accuracy_score(y_true, y_pred)
-# print precision_score(y_true, y_pred)
-# print recall_score(y_true, y_pred)
-
-
-# # 'fakes' dataset with NO MTURK fakes
-# fakes1 = data[data['id'].isin(ids)]
-# fakes1['prediction'] = np.zeros(len(fakes1))
-# # create final 'real' dataset
-# real1 = data[data['prediction'] == 1]
-# # concat
-# to_classify1 = pd.concat([fakes1, real1], ignore_index=True)
-
-# train1, test1 = split_data(to_classify1, 0.3)
-# X_train1 = train1.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
-# y_train1 = pd.DataFrame(train1['prediction'], columns=['prediction'])
-# X_test1 = test1.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
-# y_test1 = pd.DataFrame(test1['prediction'], columns=['prediction'])
-
-# svc1 = SVC(kernel='rbf', probability=True)
-# svc1.fit(X_train1, y_train1)
-# result1 = svc.predict(X_test1)
-# result_prob1 = svc.predict_proba(X_test1)
-# y_true1 = np.array(y_test1['prediction'].tolist(), dtype='float32')
-# y_pred1 = np.array(result1, dtype='float32')
-# print accuracy_score(y_true1, y_pred1)
-# print precision_score(y_true1, y_pred1)
-# print recall_score(y_true1, y_pred1)
-
-# review = '''
-#         I stayed at the nomad hotel in new york two weeks ago and I was appalled. The receptionist could not pull up our room reservation on their booking system and it took over 40 minutes for them to track it down. Given the price of the hotel, we were extecting to at least be offered some sort of refreshement during our wait, but nothing. We finally got to our room, and it was cramped and had a horrible view of a back alley. We asked to change, and depite being inconvenienced earlier, they informed us we would have to pay for an upgrade to change rooms as none of the same typology as ours were available. The decor and general atmosophere was actually quite nice, but the service we recieved was definitely sub-par. Would reccomend staying elsewhere in new york, espeically given this very high price point!
-#          '''
-# review_vector = vectorizer.transform(review)
-# dense_review_vector = review_vector.todense()
-# res_review = svc.predict(dense_review_vector)
-# print res_review
-# res_review = svc.predict_proba(dense_review_vector)
-
-# print cross_val_score(SVC(kernel='rbf', probability=True), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], cv=10, verbose=10, scoring='recall')
-
+param_grid_svc = [{"C": [0.01, 0.1, 1], "kernel": ['rbf'], "gamma":[0.0, 0.01, 0.1, 1]}]
 print get_best_model_params(SVC(), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], param_grid_svc, 'accuracy', 3)
 
 # plot_roc(y_true, result_prob)

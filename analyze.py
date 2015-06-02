@@ -7,6 +7,11 @@ from sklearn.cross_validation import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
+from sklearn.cross_validation import cross_val_score
+from sklearn.learning_curve import learning_curve
+from sklearn.metrics import precision_recall_fscore_support, roc_auc_score, roc_curve, auc
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def split_data(data, size):
@@ -22,6 +27,48 @@ def split_data(data, size):
     test = pd.DataFrame(test)
     test.rename(columns=column_dict, inplace=True)
     return train, test
+
+
+def plot_roc(test_y, result_prob):
+    '''
+    @param -> test_y : the original y (actual values for the pred)
+              result_prob : classification results with probabilities
+    @return -> NULL : only displays a graph
+    '''
+    false_positive_rate, recall, thresholds = roc_curve(test_y, result_prob[:,1])
+    roc_auc = auc(false_positive_rate, recall)
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(false_positive_rate, recall, 'b', label='AUC = %0.2f' % roc_auc)
+    plt.legend(loc='lower right')
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.0])
+    plt.ylabel('Recall')
+    plt.xlabel('Fall-out')
+    plt.show()
+
+
+param_grid_svc = [{"C": [0.01, 0.1, 1], "kernel": ['rbf'], "gamma":[0.0, 0.01, 0.1, 1]}]
+def get_best_model_params(clf, train_X, train_y, param_grid, scoring_metric, cv):
+    '''
+    @param -> train_X : n-feature matrix : train feature data
+              train_y : 1-feature matrix : train result data
+              clf : sklearn_classifier : simply initiated classifier of choice
+              param_grid : list of dictionaries :
+                           [{'max_depth':[1,2,3]}] : of parameters to tweak
+              scoring_metric : str : accuracy, precision, recall, f1 or others(?)
+              cv : int : number of times to run cross cross validation
+
+    @return -> best_estimator_ : sklearn_classifier : classifier tuned w best params
+               grid_scores : list : summary of results
+
+    NOTE: Look @ output in console to see runtimes of each of the params
+
+    '''
+    grid_search = GridSearchCV(clf, param_grid,
+                                   scoring=scoring_metric, cv=cv, verbose=10)
+    grid_search.fit(train_X, train_y)
+    return grid_search.best_estimator_, grid_search.grid_scores_
 
 data = pd.read_csv('~/Desktop/fletcher_project/review_data/review_data_ids.csv')
 vectorizer = TfidfVectorizer(stop_words="english")
@@ -62,7 +109,7 @@ y_test = pd.DataFrame(test['prediction'], columns=['prediction'])
 svc = SVC(kernel='rbf', probability=True)
 svc.fit(X_train, y_train)
 result = svc.predict(X_test)
-result_prob1 = svc.predict_proba(X_test)
+result_prob = svc.predict_proba(X_test)
 y_true = np.array(y_test['prediction'].tolist(), dtype='float32')
 y_pred = np.array(result, dtype='float32')
 print accuracy_score(y_true, y_pred)
@@ -94,4 +141,18 @@ print accuracy_score(y_true1, y_pred1)
 print precision_score(y_true1, y_pred1)
 print recall_score(y_true1, y_pred1)
 
+review = '''
+        I stayed at the nomad hotel in new york two weeks ago and I was appalled. The receptionist could not pull up our room reservation on their booking system and it took over 40 minutes for them to track it down. Given the price of the hotel, we were extecting to at least be offered some sort of refreshement during our wait, but nothing. We finally got to our room, and it was cramped and had a horrible view of a back alley. We asked to change, and depite being inconvenienced earlier, they informed us we would have to pay for an upgrade to change rooms as none of the same typology as ours were available. The decor and general atmosophere was actually quite nice, but the service we recieved was definitely sub-par. Would reccomend staying elsewhere in new york, espeically given this very high price point!
+         '''
+review_vector = vectorizer.transform(review)
+dense_review_vector = review_vector.todense()
+res_review = svc.predict(dense_review_vector)
+print res_review
+res_review = svc.predict_proba(dense_review_vector)
 
+print cross_val_score(SVC(kernel='rbf', probability=True), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], cv=10, verbose=10, scoring='recall')
+
+# print get_best_model_params(SVC(), X_train, y_train, param_grid_svc, 'accuracy', 3)
+
+# plot_roc(y_true, result_prob)
+# plot_roc(y_true1, result_prob1)

@@ -107,53 +107,66 @@ y_train = pd.DataFrame(train['prediction'], columns=['prediction'])
 X_test = test.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
 y_test = pd.DataFrame(test['prediction'], columns=['prediction'])
 
-# svc = SVC(kernel='rbf', probability=True)
-# svc.fit(X_train, y_train)
-# result = svc.predict(X_test)
-# result_prob = svc.predict_proba(X_test)
-# y_true = np.array(y_test['prediction'].tolist(), dtype='float32')
-# y_pred = np.array(result, dtype='float32')
-# print accuracy_score(y_true, y_pred)
-# print precision_score(y_true, y_pred)
-# print recall_score(y_true, y_pred)
+svc = SVC(kernel='rbf', probability=True)
+svc.fit(X_train, y_train)
+result = svc.predict(X_test)
+result_prob = svc.predict_proba(X_test)
+y_true = np.array(y_test['prediction'].tolist(), dtype='float32')
+y_pred = np.array(result, dtype='float32')
+print accuracy_score(y_true, y_pred)
+print precision_score(y_true, y_pred)
+print recall_score(y_true, y_pred)
 
 
-# # 'fakes' dataset with NO MTURK fakes
-# fakes1 = data[data['id'].isin(ids)]
-# fakes1['prediction'] = np.zeros(len(fakes1))
-# # create final 'real' dataset
-# real1 = data[data['prediction'] == 1]
-# # concat
-# to_classify1 = pd.concat([fakes1, real1], ignore_index=True)
+# 'fakes' dataset with NO MTURK fakes
+fakes1 = data[data['id'].isin(ids)]
+fakes1['prediction'] = np.zeros(len(fakes1))
+# create final 'real' dataset
+real1 = data[data['prediction'] == 1]
+# concat
+to_classify1 = pd.concat([fakes1, real1], ignore_index=True)
 
-# train1, test1 = split_data(to_classify1, 0.3)
-# X_train1 = train1.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
-# y_train1 = pd.DataFrame(train1['prediction'], columns=['prediction'])
-# X_test1 = test1.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
-# y_test1 = pd.DataFrame(test1['prediction'], columns=['prediction'])
+train1, test1 = split_data(to_classify1, 0.3)
+X_train1 = train1.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
+y_train1 = pd.DataFrame(train1['prediction'], columns=['prediction'])
+X_test1 = test1.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
+y_test1 = pd.DataFrame(test1['prediction'], columns=['prediction'])
 
-# svc1 = SVC(kernel='rbf', probability=True)
-# svc1.fit(X_train1, y_train1)
-# result1 = svc.predict(X_test1)
-# result_prob1 = svc.predict_proba(X_test1)
-# y_true1 = np.array(y_test1['prediction'].tolist(), dtype='float32')
-# y_pred1 = np.array(result1, dtype='float32')
-# print accuracy_score(y_true1, y_pred1)
-# print precision_score(y_true1, y_pred1)
-# print recall_score(y_true1, y_pred1)
+svc1 = SVC(kernel='rbf', probability=True)
+svc1.fit(X_train1, y_train1)
+result1 = svc.predict(X_test1)
+result_prob1 = svc.predict_proba(X_test1)
+y_true1 = np.array(y_test1['prediction'].tolist(), dtype='float32')
+y_pred1 = np.array(result1, dtype='float32')
+print accuracy_score(y_true1, y_pred1)
+print precision_score(y_true1, y_pred1)
+print recall_score(y_true1, y_pred1)
 
-# review = '''
-#         I stayed at the nomad hotel in new york two weeks ago and I was appalled. The receptionist could not pull up our room reservation on their booking system and it took over 40 minutes for them to track it down. Given the price of the hotel, we were extecting to at least be offered some sort of refreshement during our wait, but nothing. We finally got to our room, and it was cramped and had a horrible view of a back alley. We asked to change, and depite being inconvenienced earlier, they informed us we would have to pay for an upgrade to change rooms as none of the same typology as ours were available. The decor and general atmosophere was actually quite nice, but the service we recieved was definitely sub-par. Would reccomend staying elsewhere in new york, espeically given this very high price point!
-#          '''
-# review_vector = vectorizer.transform(review)
-# dense_review_vector = review_vector.todense()
-# res_review = svc.predict(dense_review_vector)
-# print res_review
-# res_review = svc.predict_proba(dense_review_vector)
+reviews = [
+            'I loved this hotel! It was beatiful in every way I could think of. Breakfast was on point, with good service and a very large selection of food, both at the buffet a la carte. The rooms were well decorated, and although not huge, made a good use of the available space. The staff was curteous and happy to help us with any problems we had. We called the concierge to ask for an extra bed for our son and it arrived promptly and free of charge! Prices were high, but more or less what you would expect from a hotel of this level. Would definitely reccomend.',
+            "In my search for the perfect Italian resort, I came across the wonderful Borgo Egnazia Puglia. Everything about my stay exceeded my expectations! At first I was skeptical about taking my vacation their, but after doing some online research, the choice was clear. The amazing weather I experienced during my stay certainly helped my attitude towards Borgo Egnazia Puglia, but that's not the only reason I recommend this resort. /  / Located directly on the water, the views were amazing and the air was crisp and clear. Every breath I took was equally invigorating and refreshing. The decor and style of the resort is very pleasing to the senses, and a great blend of traditional architecture and modern conveniences. /  / The rooms were very clean, and the staff extremely helpful and prompt. The pool was plenty large enough that I never felt crowded by the other guests. I enjoyed my time in the cafe as well where the food and service (once again) exceeded my expectations. My suite had a balcony with an amazing view that I also spent a fair amount of time enjoying. /  / The rooms were very comfortably furnished, and my bed was more comfortable than the bed I have at home! I heard a lot of good things about the on site golf course, but I'm not that avid of a player so I can't speak from experience in that regard. /  / All in all, it was an extremely pleasant visit, and I highly recommend Borgo Egnazia Puglia for your Italian vacation",
+            "I recently had the opportunity to stay at Borgo Egnazia Puglia. I would recommend this resort to anyone who is planning on vacationing in Italy. The grounds are magnificent. I had a suite in their luxurious hotel. The decor was unique and beautiful. I felt like royalty as I was made to feel very special. The cuisine was excellent. The resort offers a golf course, for those who choose to partake. The resort has large swimming pools and a beach for swimming or just basking in the sun. All in all this was the best vacation resort I have ever gone too.",
+            "Talk about an amazing experience! The Borgo Egnazia Puglia provides all that and a bag of chips, from stunning rooms to an immaculate, peaceful setting and all of the amenities I could every desire, this hotel is truly an immaculate place to stay. My room was huge, filled with neutral colors for a tranquil environment that made it hard to want to leave. I loved the outstanding customer service, the upscale, on-site restaurants, concierge service and   the abundance of activities ranging from golf to tennis. Of course the spa was a really special treat that spoiled me so much. For anyone who wants to stay in absolute luxury, a world within a hotel, this is the can't miss destination.",
+            'I stayed at the nomad hotel in new york two weeks ago and I was appalled. The receptionist could not pull up our room reservation on their booking system and it took over 40 minutes for them to track it down. Given the price of the hotel, we were extecting to at least be offered some sort of refreshement during our wait, but nothing. We finally got to our room, and it was cramped and had a horrible view of a back alley. We asked to change, and depite being inconvenienced earlier, they informed us we would have to pay for an upgrade to change rooms as none of the same typology as ours were available. The decor and general atmosophere was actually quite nice, but the service we recieved was definitely sub-par. Would reccomend staying elsewhere in new york, espeically given this very high price point!',
+            ]
+review_vector = vectorizer.transform(reviews)
+dense_review_vector = review_vector.todense()
+vector_df = pd.DataFrame(dense_review_vector)
+print vector_df
+res_review_prob = svc.predict_proba(dense_review_vector)
+print res_review_prob
+
+dana = pd.read_csv('~/Desktop/fletcher_project/review_data/dana.csv')
+dana_vector = vectorizer.transform(dana['Review'].apply(lambda x: str(x.decode('latin-1').encode("utf-8"))))
+dense_dana_vectors = dana_vector.todense()
+dana_df = pd.DataFrame(dense_dana_vectors)
+dana_prob = svc.predict_proba(dense_dana_vectors)
+for i in xrange(len(dana_prob)):
+    print dana_prob[i], dana['prediction'][i]
 
 # print cross_val_score(SVC(kernel='rbf', probability=True), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], cv=10, verbose=10, scoring='recall')
 
-print get_best_model_params(SVC(), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], param_grid_svc, 'accuracy', 3)
+# print get_best_model_params(SVC(), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], param_grid_svc, 'accuracy', 3)
 
 # plot_roc(y_true, result_prob)
 # plot_roc(y_true1, result_prob1)

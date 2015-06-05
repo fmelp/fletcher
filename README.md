@@ -23,9 +23,13 @@ The point of this project is to train a classifier to distinguish real from fake
       - But I didn't think 800 reviews would be enough to train a classifier well
     - Second step was designing a Positive-Unlabeled (PU) learning algorithm
       - which uses SPY method to infer which reviews from the unlabeled set are fake
+    - Third and final step is to train a Support Vector Machine classifier on the newly partioned
+      - Aggreagated the real negative data from SPY method with the 800 fake reviews from mturk [prediction = 0]
+                                                                    2614 real reviews from Expeida [prediction = 1]
+      - Trained and tested classifier with this data
 
 ##Positive-Unlabeled (PU) learning algorithm
--Step 1:
+- Step 1:
   - Infer a set of fake reviews from the unlabeled set using the spy method
   - SPY method:
     - determines a set of 'real negative data' (RN) (meaning fake reviews in this case)
@@ -46,4 +50,17 @@ The point of this project is to train a classifier to distinguish real from fake
               - if Pr(1|d) < th then:
                   - RN = RN u {d}
 
+##Results
+- Spy method:
+  - ran it over 10 times (with 20% spies) and on avg misclassified only 2.5% of the real as fake
+    - already much better results than I was expecting
+- Final classification
+  - Ran sklearn's gridsearch to tune SVC algorithm parameters
+    - Best performing: SVC(kernel='rbf', C=1, gamma=1, probability=True)
+      - cross-validated 10 times with 88.2% mean accuracy
+      - example iteration:
+        - accuracy: 0.908984145625
+        - precision: 0.906994047619
+        - recall: 0.975980784628
+ROC curve:
 ![](roc_tuned_svm_w_mturk.JPG)

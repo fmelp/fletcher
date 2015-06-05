@@ -58,6 +58,7 @@ The point of this project is to train a classifier to distinguish real from fake
   - Ran sklearn's gridsearch to tune SVC algorithm parameters
     - Best performing: SVC(kernel='rbf', C=1, gamma=1, probability=True)
       - cross-validated 10 times with 88.2% mean accuracy
+        - NOTE: untuned SVC was returning around 72% accuracy, so huge improvement!! 
       - example iteration:
         - accuracy: 0.908984145625
         - precision: 0.906994047619
@@ -65,3 +66,9 @@ The point of this project is to train a classifier to distinguish real from fake
 
 ![](roc_tuned_svm_w_mturk.JPG)
 ROC curve for this example
+
+These guys did a similar project using the data set from the M. Ott, Y. Choi, C. Cardie, and J.T. Hancock paper
+![](abstract.JPG)
+and these are their results
+![](abstract_results.JPG.JPG)
+so I actually did a little better than them! Especially considering they did not add external and novel data once running the SPY step

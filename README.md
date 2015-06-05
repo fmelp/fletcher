@@ -45,3 +45,5 @@ The point of this project is to train a classifier to distinguish real from fake
            - for each document d-e-U'
               - if Pr(1|d) < th then:
                   - RN = RN u {d}
+
+![](roc_tuned_svm_w_mturk.JPG)

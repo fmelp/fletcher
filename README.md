@@ -62,5 +62,6 @@ The point of this project is to train a classifier to distinguish real from fake
         - accuracy: 0.908984145625
         - precision: 0.906994047619
         - recall: 0.975980784628
-        -ROC curve:
+
 ![](roc_tuned_svm_w_mturk.JPG)
+ROC curve for this example

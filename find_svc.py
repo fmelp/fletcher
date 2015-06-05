@@ -105,8 +105,10 @@ y_train = pd.DataFrame(train['prediction'], columns=['prediction'])
 X_test = test.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1)
 y_test = pd.DataFrame(test['prediction'], columns=['prediction'])
 
-param_grid_svc = [{"C": [0.01, 0.1, 1], "kernel": ['rbf'], "gamma":[0.0, 0.01, 0.1, 1]}]
-print get_best_model_params(SVC(), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], param_grid_svc, 'accuracy', 3)
+# param_grid_svc = [{"C": [0.01, 0.1, 1], "kernel": ['rbf'], "gamma":[0.0, 0.01, 0.1, 1]}]
+# print get_best_model_params(SVC(), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], param_grid_svc, 'accuracy', 3)
+
+print cross_val_score(SVC(kernel='rbf', C=1, gamma=1, probability=True), to_classify.drop(['prediction', 'source', 'id', 'review', 'sentiment'], axis=1), to_classify['prediction'], cv=20)
 
 # plot_roc(y_true, result_prob)
 # plot_roc(y_true1, result_prob1)

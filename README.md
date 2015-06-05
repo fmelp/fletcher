@@ -70,5 +70,5 @@ ROC curve for this example
 These guys did a similar project using the data set from the M. Ott, Y. Choi, C. Cardie, and J.T. Hancock paper
 ![](abstract.JPG)
 and these are their results
-![](abstract_results.JPG.JPG)
+![](abstract_results.JPG)
 so I actually did a little better than them! Especially considering they did not add external and novel data once running the SPY step
